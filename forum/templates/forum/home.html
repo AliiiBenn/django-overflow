@@ -1,0 +1,83 @@
+{% extends 'forum/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h1 class="card-title">{{ description }}</h1>
+                <p class="lead">Posez vos questions, partagez vos connaissances et aidez les autres.</p>
+                <a href="#" class="btn btn-primary">Poser une question</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="h5 mb-0">Fonctionnalités principales</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-question-circle fs-3 me-2 text-primary"></i>
+                            <div>
+                                <h3 class="h6 mb-1">Posez des questions</h3>
+                                <p class="small text-muted mb-0">Obtenez des réponses de la communauté</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-chat-dots fs-3 me-2 text-primary"></i>
+                            <div>
+                                <h3 class="h6 mb-1">Répondez aux autres</h3>
+                                <p class="small text-muted mb-0">Partagez votre expertise</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-tag fs-3 me-2 text-primary"></i>
+                            <div>
+                                <h3 class="h6 mb-1">Utilisez des tags</h3>
+                                <p class="small text-muted mb-0">Organisez et trouvez du contenu</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-arrow-up-circle fs-3 me-2 text-primary"></i>
+                            <div>
+                                <h3 class="h6 mb-1">Votez et commentez</h3>
+                                <p class="small text-muted mb-0">Évaluez la qualité des réponses</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="h5 mb-0">Statistiques</h2>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Questions</span>
+                    <span class="badge bg-primary">0</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Réponses</span>
+                    <span class="badge bg-success">0</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span>Membres</span>
+                    <span class="badge bg-info">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
