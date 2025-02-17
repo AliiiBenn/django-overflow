@@ -1,0 +1,80 @@
+{% extends 'forum/base.html' %}
+
+{% block content %}
+<div class="flex justify-center items-center">
+    <div class="card w-full max-w-2xl bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title text-2xl font-bold mb-2 justify-center">
+                {% if question %}Modifier la question{% else %}Poser une question{% endif %}
+            </h2>
+            <p class="text-center text-base-content/70 mb-6">
+                {% if question %}
+                    Mettez à jour votre question pour plus de clarté
+                {% else %}
+                    Soyez précis et incluez tous les détails nécessaires
+                {% endif %}
+            </p>
+
+            <form method="post">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="alert alert-error shadow-lg mb-4">
+                        <div>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>{{ form.non_field_errors.0 }}</span>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text">Titre de la question</span>
+                        <span class="label-text-alt text-base-content/70">Soyez spécifique et imaginez que vous posez la question à une autre personne</span>
+                    </label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                        <label class="label">
+                            <span class="label-text-alt text-error">{{ form.title.errors.0 }}</span>
+                        </label>
+                    {% endif %}
+                </div>
+
+                <div class="form-control w-full mt-4">
+                    <label class="label">
+                        <span class="label-text">Contenu de la question</span>
+                        <span class="label-text-alt text-base-content/70">Incluez tous les détails nécessaires pour obtenir une réponse</span>
+                    </label>
+                    {{ form.content }}
+                    {% if form.content.errors %}
+                        <label class="label">
+                            <span class="label-text-alt text-error">{{ form.content.errors.0 }}</span>
+                        </label>
+                    {% endif %}
+                </div>
+
+                <div class="form-control w-full mt-4">
+                    <label class="label">
+                        <span class="label-text">Tags</span>
+                        <span class="label-text-alt text-base-content/70">Ajoutez jusqu'à 5 tags pour décrire votre question</span>
+                    </label>
+                    {{ form.tags }}
+                    {% if form.tags.errors %}
+                        <label class="label">
+                            <span class="label-text-alt text-error">{{ form.tags.errors.0 }}</span>
+                        </label>
+                    {% endif %}
+                </div>
+
+                <div class="form-control mt-6">
+                    <button type="submit" class="btn btn-primary">
+                        {% if question %}Mettre à jour{% else %}Publier la question{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

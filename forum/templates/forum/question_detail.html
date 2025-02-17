@@ -1,0 +1,266 @@
+{% extends 'forum/base.html' %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+    <!-- Colonne principale -->
+    <div class="lg:col-span-3">
+        <!-- Question -->
+        <div class="card bg-base-100 shadow-xl mb-6">
+            <div class="card-body">
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <h1 class="card-title text-2xl">{{ question.title }}</h1>
+                        <div class="flex gap-2 my-2">
+                            {% for tag in question.tags.all %}
+                                <div class="badge badge-outline">{{ tag.name }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% if user == question.author %}
+                        <a href="{% url 'question_edit' question.slug %}" class="btn btn-ghost btn-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                            Modifier
+                        </a>
+                    {% endif %}
+                </div>
+
+                <div class="flex gap-4">
+                    <!-- Votes -->
+                    <div class="flex flex-col items-center gap-2">
+                        {% if user.is_authenticated and user != question.author %}
+                            <button class="btn btn-ghost btn-sm vote-btn" data-type="question" data-id="{{ question.id }}" data-vote="up">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                                </svg>
+                            </button>
+                        {% endif %}
+                        <span class="text-xl font-bold votes-count" data-type="question" data-id="{{ question.id }}">
+                            {{ question.votes_count }}
+                        </span>
+                        {% if user.is_authenticated and user != question.author %}
+                            <button class="btn btn-ghost btn-sm vote-btn" data-type="question" data-id="{{ question.id }}" data-vote="down">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                        {% endif %}
+                    </div>
+
+                    <!-- Contenu -->
+                    <div class="flex-1">
+                        <div class="prose max-w-none">
+                            {{ question.content|linebreaks }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center mt-4 pt-4 border-t">
+                    <div class="flex items-center space-x-2 text-sm text-base-content/70">
+                        <span>Posée {{ question.created_at|timesince }}</span>
+                        <span>•</span>
+                        <span>Vue {{ question.views_count }} fois</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="avatar placeholder">
+                            <div class="bg-neutral-focus text-neutral-content rounded-full w-8">
+                                <span class="text-xs">{{ question.author.username|slice:":2"|upper }}</span>
+                            </div>
+                        </div>
+                        <div class="text-sm">
+                            <div class="font-medium">{{ question.author.username }}</div>
+                            <div class="text-base-content/70">Auteur</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Réponses -->
+        <div class="card bg-base-100 shadow-xl mb-6">
+            <div class="card-body">
+                <h2 class="card-title">
+                    {{ question.answers.count }} Réponse{% if question.answers.count != 1 %}s{% endif %}
+                </h2>
+
+                {% for answer in question.answers.all %}
+                    <div class="py-4 {% if not forloop.last %}border-b{% endif %}">
+                        <div class="flex gap-4">
+                            <!-- Votes -->
+                            <div class="flex flex-col items-center gap-2">
+                                {% if user.is_authenticated and user != answer.author %}
+                                    <button class="btn btn-ghost btn-sm vote-btn" data-type="answer" data-id="{{ answer.id }}" data-vote="up">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                                        </svg>
+                                    </button>
+                                {% endif %}
+                                <span class="text-xl font-bold votes-count" data-type="answer" data-id="{{ answer.id }}">
+                                    {{ answer.votes_count }}
+                                </span>
+                                {% if user.is_authenticated and user != answer.author %}
+                                    <button class="btn btn-ghost btn-sm vote-btn" data-type="answer" data-id="{{ answer.id }}" data-vote="down">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </button>
+                                {% endif %}
+                            </div>
+
+                            <!-- Contenu -->
+                            <div class="flex-1">
+                                <div class="prose max-w-none">
+                                    {{ answer.content|linebreaks }}
+                                </div>
+
+                                <div class="flex justify-between items-center mt-4">
+                                    <div class="flex items-center space-x-4">
+                                        {% if user == question.author and not question.is_solved %}
+                                            <a href="{% url 'answer_accept' question.slug answer.id %}" class="btn btn-success btn-sm">
+                                                Accepter comme solution
+                                            </a>
+                                        {% endif %}
+                                        {% if answer.is_accepted %}
+                                            <div class="badge badge-success gap-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                Solution acceptée
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="avatar placeholder">
+                                            <div class="bg-neutral-focus text-neutral-content rounded-full w-8">
+                                                <span class="text-xs">{{ answer.author.username|slice:":2"|upper }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="text-sm">
+                                            <div class="font-medium">{{ answer.author.username }}</div>
+                                            <div class="text-base-content/70">{{ answer.created_at|timesince }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Formulaire de réponse -->
+        {% if user.is_authenticated %}
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <h2 class="card-title">Votre réponse</h2>
+                    <form method="post">
+                        {% csrf_token %}
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-error shadow-lg mb-4">
+                                <div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span>{{ form.non_field_errors.0 }}</span>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div class="form-control w-full">
+                            {{ form.content }}
+                            {% if form.content.errors %}
+                                <label class="label">
+                                    <span class="label-text-alt text-error">{{ form.content.errors.0 }}</span>
+                                </label>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-control mt-6">
+                            <button type="submit" class="btn btn-primary">Publier la réponse</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info shrink-0 w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div>
+                    <h3 class="font-bold">Connectez-vous pour répondre</h3>
+                    <div class="text-xs">Vous devez être connecté pour pouvoir répondre aux questions</div>
+                </div>
+                <div class="flex gap-2">
+                    <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-sm btn-primary">Se connecter</a>
+                    <a href="{% url 'register' %}?next={{ request.path }}" class="btn btn-sm">S'inscrire</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Barre latérale -->
+    <div class="lg:col-span-1">
+        <div class="card bg-base-100 shadow-xl sticky top-4">
+            <div class="card-body">
+                <h2 class="card-title">À propos</h2>
+                <div class="stats stats-vertical shadow">
+                    <div class="stat">
+                        <div class="stat-title">Vues</div>
+                        <div class="stat-value text-primary">{{ question.views_count }}</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-title">Réponses</div>
+                        <div class="stat-value text-secondary">{{ question.answers.count }}</div>
+                    </div>
+                </div>
+
+                {% if question.is_solved %}
+                    <div class="alert alert-success shadow-lg mt-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Cette question a une solution acceptée</span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gestion des votes
+    document.querySelectorAll('.vote-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const type = this.dataset.type;
+            const id = this.dataset.id;
+            const voteType = this.dataset.vote;
+            
+            fetch(`/${type}/${id}/vote/${voteType}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    // Affiche l'erreur
+                    alert(data.error);
+                } else {
+                    // Met à jour le compteur de votes
+                    document.querySelector(`.votes-count[data-type="${type}"][data-id="${id}"]`).textContent = data.votes_count;
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Une erreur est survenue lors du vote');
+            });
+        });
+    });
+});
+</script>
+{% endblock %}
+{% endblock %} 
